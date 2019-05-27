@@ -1,5 +1,8 @@
 (ns bhatkhande.db
   (:require [clojure.spec.alpha :as s]
+                                        ;[bhatkhande.languages :refer [langs]]
+            [bhatkhande.hindi :as hindi]
+            [bhatkhande.english :as english]
             [bhatkhande.spec :as us]))
 
 (defn percentage-95
@@ -7,6 +10,7 @@
   (let [ iw (js/parseInt i)]
     (- iw (* 0.05 iw))))
 
+;(def selected-language #'bhatkhande.hindi)
 (def dispinfo
   {:x 20 :y 30 :under 30
    :x-start 20
@@ -17,8 +21,8 @@
    :write-part-label true
    :write-comp-label true
    :write-line-separator true
-   :swaramap (zipmap us/i-note-seq 
-           ["सा" "रे॒" "रे" "ग॒" "ग" "म" "म॑" "प" "ध॒" "ध" "नि॒" "नि" "-" "ऽ"])
+   :language :hindi
+   :swaramap #'bhatkhande.hindi/swaramap 
    
    :kan {:kan-raise 10
          :reduce-font-size 5 
