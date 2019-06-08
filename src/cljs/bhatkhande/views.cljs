@@ -5,6 +5,7 @@
    [bhatkhande.subs :as subs]
    [reagent.core :as reagent :refer [atom]]
    [quil.core :as q :include-macros true]
+  ; [cljs.spec.alpha :as s]  
    [quil.middleware :as m]
    [bhatkhande.events :as e]
    [bhatkhande.parts :as p]
@@ -12,7 +13,7 @@
    [bhatkhande.db :as db]
    [bhatkhande.events :as ev]
    ))
-
+;(s/def ::abc boolean?)
 (defn setup []
   (q/no-loop))
 

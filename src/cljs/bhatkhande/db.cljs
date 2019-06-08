@@ -1,5 +1,5 @@
 (ns bhatkhande.db
-  (:require [clojure.spec.alpha :as s]
+  (:require 
                                         ;[bhatkhande.languages :refer [langs]]
             [bhatkhande.hindi :as hindi]
             [bhatkhande.english :as english]

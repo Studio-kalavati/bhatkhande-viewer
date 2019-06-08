@@ -1,8 +1,5 @@
 (ns bhatkhande.parts
-  (:require [clojure.spec.alpha :as s]
-            [clojure.spec.test.alpha :as stest]
-            [bhatkhande.spec :as us]
-            [quil.core :as q :include-macros true]
+  (:require [quil.core :as q :include-macros true]
             [quil.middleware :as m]
             [quil.core :as q]))
 
