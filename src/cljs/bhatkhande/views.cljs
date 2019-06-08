@@ -9,7 +9,7 @@
    [quil.middleware :as m]
    [bhatkhande.events :as e]
    [bhatkhande.parts :as p]
-   [bhatkhande.spec :as us]
+   [sargam.spec :as us]
    [bhatkhande.db :as db]
    [bhatkhande.events :as ev]
    ))

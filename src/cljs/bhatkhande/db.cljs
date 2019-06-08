@@ -1,9 +1,8 @@
 (ns bhatkhande.db
   (:require 
-                                        ;[bhatkhande.languages :refer [langs]]
             [bhatkhande.hindi :as hindi]
             [bhatkhande.english :as english]
-            [bhatkhande.spec :as us]))
+            [sargam.spec :as us]))
 
 (defn percentage-95
   [i]

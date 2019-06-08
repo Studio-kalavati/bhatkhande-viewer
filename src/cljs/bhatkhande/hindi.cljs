@@ -1,7 +1,7 @@
 (ns bhatkhande.hindi
-  (:require [bhatkhande.ragas :as r]
-            [bhatkhande.spec :as us]
-            [bhatkhande.talas :as t]))
+  (:require [sargam.ragas :as r]
+            [sargam.spec :as us]
+            [sargam.talas :as t]))
 
 (def tala-labels (zipmap t/all-talas
                          ["तीन्ताल" "झप्ताल"]))

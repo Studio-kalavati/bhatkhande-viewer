@@ -1,8 +1,8 @@
-(defproject swaranotebook/bhatkhande-viewer "0.1.0-SNAPSHOT"
+(defproject studiokalavati/bhatkhande-viewer "0.1.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/clojurescript "1.10.516"]
                  [reagent "0.8.1"]
-                 [swaranotebook/bhatkhande-spec "0.1.0-SNAPSHOT"]
+                 [studiokalavati/sargam-spec "0.1.0-SNAPSHOT"]
                  [reagent-utils "0.3.1"]
                  [cljs-bach "0.3.0"]
                  [re-frame "0.10.6"]
@@ -10,7 +10,6 @@
                  [com.andrewmcveigh/cljs-time "0.5.0"]
                  [org.clojure/math.combinatorics "0.1.4"]
                  [re-com "2.5.0"]
-                 [com.shark8me/re-frame-firebase "0.8.0-kk"]
                  [com.cognitect/transit-cljs "0.8.256"]
                  [compojure "1.6.1"]
                  [org.clojure/core.async "0.4.474"]
@@ -19,7 +18,6 @@
                  [venantius/accountant "0.2.4"]
                  [org.clojars.nenadalm/uri "0.1.2-SNAPSHOT"]
                  [cljsjs/bootstrap "3.3.6-1"]
-                 [shark8me/bhatkhande-editor "0.1.0-SNAPSHOT"]
                  [chronoid "0.1.1"]
                  [funcool/promesa "2.0.1"]
                  ]
