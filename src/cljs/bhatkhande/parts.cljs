@@ -55,13 +55,14 @@
 (defn disp-bhaag
   [dispinfo inp]
   (let [{:keys [x y x-start x-end sam-khaali font-size spacing y-inc]} dispinfo
-        {:keys [bhaag]} inp ]
+        {:keys [bhaag beat]} inp ]
+    (println " disp-bhaag " sam-khaali " bhaag " inp)
     (if bhaag
       (let [ix x 
             [ix y1] (if (>= ix (* 0.9 x-end)) [x-start (+ y y-inc)]
                         [ix y])]
         (do
-          (q/stroke-weight 2)
+          (q/stroke-weight 1)
           (q/line [ix (- y1 sam-khaali)] [ix (+ y1 sam-khaali)])
           (assoc dispinfo :x (+ ix spacing (q/text-width bhaag)) :y y1)))
       dispinfo)))
@@ -104,7 +105,7 @@
 
 (defn disp-note
   [dispinfo inp]
-  (let [{:keys [:note bhaag]} inp]
+  (let [{:keys [bhaag]} inp]
     (if bhaag
       (disp-bhaag dispinfo inp)
       (disp-swara dispinfo inp))))
@@ -143,11 +144,12 @@
 (defn disp-m-note
   [dispinfo inp]
   (->> (reduce disp-s-note dispinfo inp)
-       add-cursor-at-end))
+       #_add-cursor-at-end))
 
 (defn disp-part-label
   [dispinfo inp]
   (let [{:keys [part-header-font-size x y header-y-spacing write-part-label]} dispinfo]
+    (println " inp text " inp)
     (if write-part-label 
       (do 
         (q/text-size part-header-font-size) 
@@ -190,10 +192,15 @@
   [dispinfo]
   (let [{:keys [x y x-end header-y-spacing write-line-separator]} dispinfo
         x2 (/ x-end 2)
-        x3 (/ x-end 4)]
-    (when write-line-separator 
-      (q/line [(- x2 x3 ) (+ y header-y-spacing)] 
-              [(+ x3 x2) (+ y header-y-spacing)]))))
+        x3 (/ x-end 6)
+        y1 (+ y (* 2 header-y-spacing))]
+    (if write-line-separator
+      (do
+        (q/stroke-weight 1)
+        (q/line [(- x2 x3 ) y1] 
+                [(+ x3 x2) y1])
+        (assoc dispinfo :y (+ y1 header-y-spacing)))
+      (assoc dispinfo :y y1))))
 
 (defn disp-part
   [dispinfo inp]
@@ -205,20 +212,23 @@
             (assoc :ith [0])
             (disp-part-label part-label)
             (disp-m-note m-noteseq))]
-    (line-separator d1)
-    (-> d1 
-        (assoc :x x-start :y (+ (:y d1) (* 2 header-y-spacing)))
+    ;(line-separator d1)
+    (-> d1
+        line-separator
+        (assoc :x x-start ;:y (+ (:y d1) (* 2 header-y-spacing))
+               )
         (update-in [:part-coordinates] (comp vec reverse)))))
 
 (defn disp-comp-label
   [dispinfo inp]
-  (let [{:keys [x y  comp-label-font-size header-y-spacing write-comp-label]} dispinfo]
+  (let [{:keys [x y x-end comp-label-font-size header-y-spacing write-comp-label]} dispinfo]
     (if write-comp-label
       (do 
         (q/text-size comp-label-font-size) 
-        (q/text inp x y) 
-        (line-separator dispinfo) 
-        (assoc dispinfo :y (+ y (* 2 header-y-spacing))))
+        (q/text inp (/ x-end 3) y)
+        (-> dispinfo 
+            #_(line-separator) 
+            (assoc :y (+ y (* 2 header-y-spacing)))))
       dispinfo)))
 
 (defn disp-comp

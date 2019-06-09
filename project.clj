@@ -6,6 +6,7 @@
                  [reagent-utils "0.3.1"]
                  [cljs-bach "0.3.0"]
                  [re-frame "0.10.6"]
+                 [quil "2.8.0"]
                  [cljs-ajax "0.5.5"]
                  [com.andrewmcveigh/cljs-time "0.5.0"]
                  [org.clojure/math.combinatorics "0.1.4"]
@@ -30,11 +31,8 @@
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"
                                     "test/js"]
-  :figwheel {:css-dirs ["resources/public/css"]
-             ;:ring-handler keyboard.core/app
-             }
+  :figwheel {:css-dirs ["resources/public/css"]}
 
-  ;:repositories [["snapshots" "https://mymavenrepo.com/repo/8pnRErH4cvAOlpKbwSeO/"]]  
   :doo {:build "test"}
   :profiles
   {:dev
@@ -43,9 +41,7 @@
    :dependencies [[binaryage/devtools "0.9.10"]
                   [figwheel-sidecar "0.5.18" :exclusions [[org.clojure/tools.nrepl]]]
                    [cider/piggieback "0.3.10"]
-                   ;[org.clojure/tools.nrepl "0.2.13"]
                    [nrepl "0.6.0"]
-                                        ;[com.cemerick/piggieback "0.2.2"]
 
                   ;;for re-frame-10x
                   [reagent "0.8.1"]
@@ -69,8 +65,6 @@
                     :asset-path           "/js/compiled/out"
                     :source-map-timestamp true
                     :preloads             [devtools.preload]
-                    ;:closure-defines      {"re_frame.trace.trace_enabled_QMARK_" true "day8.re_frame.tracing.trace_enabled_QMARK_"  true}
-                    ;:preloads             [day8.re-frame-10x.preload]
                     :optimizations   :none
                     :external-config      {:devtools/config {:features-to-install :all}}
                     }}
@@ -78,10 +72,6 @@
      :source-paths ["src/cljs"]
      :compiler     {:main                 bhatkhande.core
                     :output-to            "resources/public/js/compiled/bhatkhande.js"
-                    ;:output-dir           "resources/public/js/compiled/kbdprodout"
-                    ;:asset-path           "js/compiled/kbdprodout"
-                    ;:source-map-timestamp false
-                    ;:closure-defines {goog.DEBUG true keyboard.events true}
                     :language-out :ecmascript6
                     :optimizations   :advanced
                     }}

@@ -1,30 +1,30 @@
 (ns bhatkhande.db
-  (:require 
-            [bhatkhande.hindi :as hindi]
-            [bhatkhande.english :as english]
-            [sargam.spec :as us]))
+  (:require
+   [bhatkhande.hindi :as hindi]
+   [bhatkhande.english :as english]
+   [sargam.spec :as us]))
 
 (defn percentage-95
   [i]
   (let [ iw (js/parseInt i)]
     (- iw (* 0.05 iw))))
 
-;(def selected-language #'bhatkhande.hindi)
+                                        ;(def selected-language #'bhatkhande.hindi)
 (def dispinfo
   {:x 20 :y 30 :under 30
    :x-start 20
    :y-inc 80
-   :x-end (percentage-95 (.-innerWidth js/window))
-   :y-end (percentage-95 (.-innerHeight js/window))
+   :x-end (int (percentage-95 (.-innerWidth js/window)))
+   :y-end (int (percentage-95 (.-innerHeight js/window)))
    :over 30
    :write-part-label true
    :write-comp-label true
    :write-line-separator true
    :language :hindi
-   :swaramap #'bhatkhande.hindi/swaramap 
-   
+   :swaramap #'bhatkhande.hindi/swaramap
+
    :kan {:kan-raise 10
-         :reduce-font-size 5 
+         :reduce-font-size 5
          :reduce-spacing 3
          :reduce-octave-size 5}
    :octave 15
@@ -80,39 +80,38 @@
             ])
 
 (def antara1 [[{:note [:madhyam :s]}]
-            [{:note [:madhyam :r]}]
-            [{:note [:mandra :-n]}]
-            [{:note [:madhyam :r]
-              :kan [:madhyam :s] }]
-            [{:note [:madhyam :s]}]
-            [{:note [:madhyam :r]}]
-            [{:note [:mandra :-n]}]
-            [{:note [:madhyam :s]}]
-            [{:note [:madhyam :r]}]
-            [{:note [:mandra :-n]}]
+              [{:note [:madhyam :r]}]
+              [{:note [:mandra :-n]}]
+              [{:note [:madhyam :r]
+                :kan [:madhyam :s] }]
+              [{:note [:madhyam :s]}]
+              [{:note [:madhyam :r]}]
+              [{:note [:mandra :-n]}]
+              [{:note [:madhyam :s]}]
+              [{:note [:madhyam :r]}]
+              [{:note [:mandra :-n]}]
               ])
 
-(def test1 
+(def test1
   {:m-noteseq iseq1
    :taal {:num-beats 10 :taal-name :jhaptaal
-    :taal-label "झपताल"
-    :sam-khaali {1 "x" 3 "2" 8 "4" 6 "o"}
-              :bhaags [2 3 2 3]}
-   :part-label "partname"
-   })
+          :taal-label "झपताल"
+          :sam-khaali {1 "x" 3 "2" 8 "4" 6 "o"}
+          :bhaags [2 3 2 3]}
+   :part-label "partname"})
 
 (def comp1 {:parts [{:m-noteseq iseq1
-                         :part-label "Sthayi"
-                         }
-                        {:m-noteseq antara1
-                         :part-label "Antara"
-                         }
-                        ]
+                     :part-label "स्थाइ"}
+                    {:m-noteseq antara1 :part-label "अन्तरा"}]
             :taal {:num-beats 10 :taal-name :jhaptaal
-                       :taal-label "झपताल"
-                       :sam-khaali {1 "x" 3 "2" 8 "4" 6 "o"}
-                       :bhaags [2 3 2 3]}
+                   :taal-label "झपताल"
+                   :sam-khaali {1 "x" 3 "2" 8 "4" 6 "o"}
+                   :bhaags [2 3 2 3]}
             :comp-id "fadaccaa"
-            :comp-label "Bandish name"})
+            :comp-label "नीर भरन कैसे जाउ"})
+
 (def default-db
-  {:name "re-frame" })
+  {:init-state {:cursor-color 1}
+   :dim (mapv dispinfo [:x-end :y-end])
+   :saved-comp comp1
+   :dispinfo dispinfo})
