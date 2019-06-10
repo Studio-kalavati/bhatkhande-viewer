@@ -11,8 +11,6 @@
       [i1]
       (conj i i1))) )
 
-
-
 (defn disp-octave
   [dispinfo inp]
   (if (or
@@ -28,7 +26,6 @@
 (defn disp-kan
   [dispinfo inp]
   (let [[oct note] inp
-        ;_ (println " disp-kan " note " - " inp )
         {:keys [x y font-size spacing text-align kan octave] :as di} dispinfo
         {:keys [kan-raise reduce-font-size reduce-spacing reduce-octave-size]} kan
         y1 (- y kan-raise)
@@ -56,7 +53,6 @@
   [dispinfo inp]
   (let [{:keys [x y x-start x-end sam-khaali font-size spacing y-inc]} dispinfo
         {:keys [bhaag beat]} inp ]
-    (println " disp-bhaag " sam-khaali " bhaag " inp)
     (if bhaag
       (let [ix x 
             [ix y1] (if (>= ix (* 0.9 x-end)) [x-start (+ y y-inc)]
@@ -111,10 +107,20 @@
       (disp-swara dispinfo inp))))
 
 (defn disp-underbrace
-  [dispinfo ]
-  (let [ under-m "︶"
-        {:keys [x y under]} dispinfo]
-    (q/text under-m x (+ y under))))
+  "draws the underbrace under swaras where cnt > 1.
+  The third argument is the width of the characters under which to draw the underbrace"
+  [dispinfo inp char-width]
+  (let [under-m "︶"
+        {:keys [x y under]} dispinfo
+        cur-fill (q/current-fill)
+        cnt (count inp)]
+    (if (> cnt 2)
+      (do
+        (q/ellipse-mode :corner)
+        (q/no-fill)
+        (q/arc (- x 3) y char-width 20 0.4 2.5 )
+        (q/fill cur-fill))
+      (q/text under-m x (+ y under)))))
 
 
 (defn disp-s-note
@@ -123,10 +129,13 @@
   (if (= 1 (count inp))
     (disp-note dispinfo (first inp))
     (let [ispa (:spacing dispinfo)
-          _ (disp-underbrace dispinfo)
+          {:keys [x y ]} dispinfo
           res (reduce disp-note (-> dispinfo
                                     (assoc :spacing 1)
-                                    (update-in [:ith] #(conj % 0))) inp)]
+                                    (update-in [:ith] #(conj % 0))) inp)
+          ;;display underbrace after drawing swaras, so that the underbrace knows the swara width
+          _ (disp-underbrace dispinfo inp (- (:x res) x))
+          ]
       ;;remove spacing so that the swaras as close together
       (-> res
           (assoc :spacing ispa :x (+ ispa (:x res)))
@@ -149,7 +158,6 @@
 (defn disp-part-label
   [dispinfo inp]
   (let [{:keys [part-header-font-size x y header-y-spacing write-part-label]} dispinfo]
-    (println " inp text " inp)
     (if write-part-label 
       (do 
         (q/text-size part-header-font-size) 
@@ -212,11 +220,9 @@
             (assoc :ith [0])
             (disp-part-label part-label)
             (disp-m-note m-noteseq))]
-    ;(line-separator d1)
     (-> d1
         line-separator
-        (assoc :x x-start ;:y (+ (:y d1) (* 2 header-y-spacing))
-               )
+        (assoc :x x-start)
         (update-in [:part-coordinates] (comp vec reverse)))))
 
 (defn disp-comp-label
@@ -227,7 +233,6 @@
         (q/text-size comp-label-font-size) 
         (q/text inp (/ x-end 3) y)
         (-> dispinfo 
-            #_(line-separator) 
             (assoc :y (+ y (* 2 header-y-spacing)))))
       dispinfo)))
 

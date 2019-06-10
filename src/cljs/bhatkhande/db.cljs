@@ -33,18 +33,35 @@
    :comp-label-font-size 35
    :header-y-spacing 50
    :sam-khaali 35
-   :debug {:disp-swara true}
-   :font-size 20 :spacing 10 :text-align :left})
+   :debug {:disp-swara false}
+   :font-size 20
+   ;:font-size 25
+   :spacing 10 :text-align :left})
 
 (def iseq1 [[{:note [:madhyam :s]}]
             [{:note [:taar :r]}]
             [{:note [:mandra :-n]}]
             [{:note [:madhyam :r]
               :kan [:madhyam :-g]}]
+            [
+             {:note [:taar :g]}
+             {:note [:taar :r]}
+             {:note [:mandra :n]}
+             {:note [:madhyam :s]}
+             {:note [:madhyam :d]}
+             {:note [:madhyam :m]}
+             ]
             [{:note [:taar :r]}
-             {:note [:mandra :n]
-              :kan [:madhyam :-g]}
-             {:note [:madhyam :s]}]
+             {:note [:mandra :n]}
+             {:note [:madhyam :s]}
+             {:note [:madhyam :s]}
+             {:note [:madhyam :m]}
+             ]
+            [{:note [:taar :r]}
+             {:note [:mandra :n]}
+             {:note [:madhyam :s]}
+             {:note [:madhyam :s]}
+             ]
             [{:note [:madhyam :-g]}
              {:note [:madhyam :m]}]
             [{:note [:madhyam :-]}
