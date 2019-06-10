@@ -5,7 +5,6 @@
    [bhatkhande.subs :as subs]
    [reagent.core :as reagent :refer [atom]]
    [quil.core :as q :include-macros true]
-  ; [cljs.spec.alpha :as s]  
    [quil.middleware :as m]
    [bhatkhande.events :as e]
    [bhatkhande.parts :as p]
@@ -26,27 +25,32 @@
   ([] (setup false nil))
   ([loop? init-fn]
    (fn []
-     (let [;fr @(subscribe [::subs/frame-rate])
-           ;_ (reset! cmap (color-map fr))
-           _ (q/no-loop)
+     (let [_ (q/no-loop)
            {:keys [location-info disp-info] :as imap} (init-fn)
            ]
        @(subscribe [::subs/init-state])))))
 
 (defn viewer-sketch
-  "creates an canvas for viewing"
-  [part div-id size-fn dinfo]
-  (let [idraw (fn[](let [_ (q/background 255)
-                         _ (q/fill 0)]
-                     (p/disp-comp dinfo @part)))]
-    (q/sketch
-     :setup (setup false idraw)
-     :update identity 
-     :draw (fn [state]
-             state)
-     :host div-id
-     :middleware [m/fun-mode]
-     :size (size-fn))))
+  "creates an canvas for viewing.
+  The third argument displays the part. If an entire composition is passed (the default),
+  then p/disp-comp is used. If a part is the first argument, then use p/disp-part"
+  ([size-fn dinfo]
+   (viewer-sketch size-fn
+                  dinfo
+                  p/disp-comp))
+  ([size-fn dinfo disp-fn]
+   (fn [part div-id]
+     (let [idraw (fn[](let [_ (q/background 255)
+                            _ (q/fill 0)]
+                        (disp-fn dinfo @part)))]
+       (q/sketch
+        :setup (setup false idraw)
+        :update identity 
+        :draw (fn [state]
+                state)
+        :host div-id
+        :middleware [m/fun-mode]
+        :size (size-fn))))))
 
 
 (defn disp-swara-canvas
@@ -57,8 +61,8 @@
     (reagent/create-class
      {:reagent-render
       (fn [] [(keyword (str "canvas#" div-id))])
-      :component-did-update vfn 
-      :component-did-mount vfn })))
+      :component-did-update (partial (vfn) cur-part div-id) 
+      :component-did-mount (partial (vfn) cur-part div-id)})))
 
 (defn main-panel
   []
@@ -81,9 +85,5 @@
                          :height "250px"}}
            [:div {:style imap}
             [disp-swara-canvas sp div-id
-             #(viewer-sketch sp div-id
-                             (constantly @(subscribe [::subs/div-dim :editor]))
+             #(viewer-sketch (constantly @(subscribe [::subs/div-dim :editor]))
                              (assoc @(subscribe [::subs/dispinfo]) :y 30))]]]]]))))
-
-#_(defn main-panel []
-  [quil-area])
