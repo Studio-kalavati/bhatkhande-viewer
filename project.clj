@@ -4,24 +4,16 @@
                  [reagent "0.8.1"]
                  [studiokalavati/sargam-spec "0.1.0-SNAPSHOT"]
                  [reagent-utils "0.3.1"]
-                 [cljs-bach "0.3.0"]
                  [re-frame "0.10.6"]
                  [quil "2.8.0"]
-                 [cljs-ajax "0.5.5"]
-                 [com.andrewmcveigh/cljs-time "0.5.0"]
-                 [org.clojure/math.combinatorics "0.1.4"]
                  [re-com "2.5.0"]
-                 [com.cognitect/transit-cljs "0.8.256"]
                  [compojure "1.6.1"]
-                 [org.clojure/core.async "0.4.474"]
-                 [pez/clerk "1.0.0"]
-                 [bidi "2.1.4"]
-                 [venantius/accountant "0.2.4"]
-                 [org.clojars.nenadalm/uri "0.1.2-SNAPSHOT"]
                  [cljsjs/bootstrap "3.3.6-1"]
-                 [chronoid "0.1.1"]
-                 [funcool/promesa "2.0.1"]
                  ]
+  :description "Display sargam-spec format compositions in HTML5 canvas"
+  :url "https://github.com/Studio-kalavati/bhatkhande-notation"
+  :license {:name "EPL-2.0"
+            :url "https://www.eclipse.org/legal/epl-2.0/"}
 
   :plugins [[lein-cljsbuild "1.1.7"]]
 
