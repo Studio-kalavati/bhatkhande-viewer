@@ -131,4 +131,5 @@
   {:init-state {:cursor-color 1}
    :dim (mapv dispinfo [:x-end :y-end])
    :saved-comp comp1
+   :saved-part test1
    :dispinfo dispinfo})

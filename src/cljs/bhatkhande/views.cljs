@@ -66,8 +66,8 @@
 
 (defn main-panel
   []
-  (fn []
-    (let [sp (subscribe [::subs/saved-comp])]
+  (let [view-comp (reagent/atom "part")]
+    (fn []
       (let [imap {:width "100%"
                   :height "100%"
                   :position :absolute
@@ -80,10 +80,22 @@
          [[re-com/title
            :label "Example showing a composition annotated with Bhatkhande notation"
            :level :level2]
+          [re-com/h-box :children [(doall (for [c ["comp" "part"]]
+                                            ^{:key c}
+                                            [re-com/radio-button
+                                             :label c :value c
+                                             :model view-comp
+                                             :on-change #(reset! view-comp %)]))]]
           [:div {:style {:position :relative
                          :width "500px"
                          :height "250px"}}
            [:div {:style imap}
-            [disp-swara-canvas sp div-id
-             #(viewer-sketch (constantly @(subscribe [::subs/div-dim :editor]))
-                             (assoc @(subscribe [::subs/dispinfo]) :y 30))]]]]]))))
+            (if (= "comp" @view-comp)
+              [disp-swara-canvas (subscribe [::subs/saved-comp]) div-id
+               #(viewer-sketch (constantly @(subscribe [::subs/div-dim :editor]))
+                               (assoc @(subscribe [::subs/dispinfo]) :y 30))]
+
+              [disp-swara-canvas (subscribe [::subs/saved-part]) div-id
+               #(viewer-sketch (constantly @(subscribe [::subs/div-dim :editor]))
+                               (assoc @(subscribe [::subs/dispinfo]) :y 30)
+                               p/disp-part)])]]]]))))

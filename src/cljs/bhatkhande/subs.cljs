@@ -3,6 +3,12 @@
    [re-frame.core :as re-frame]))
 
 (re-frame/reg-sub
+ ::saved-part
+ (fn [db]
+   (let [res (:saved-part db)]
+     res)))
+
+(re-frame/reg-sub
  ::saved-comp
  (fn [db]
    (let [res (:saved-comp db)]

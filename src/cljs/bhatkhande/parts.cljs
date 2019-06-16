@@ -3,7 +3,7 @@
             [quil.middleware :as m]
             [quil.core :as q]))
 
-(defn incr-ith
+(defn- incr-ith
   [k]
   (let [i (pop k)
         i1 (inc (peek k))]
@@ -12,6 +12,7 @@
       (conj i i1))) )
 
 (defn disp-octave
+  "add a dot above or below a swara"
   [dispinfo inp]
   (if (or
        (= :taar inp)
@@ -24,6 +25,8 @@
     dispinfo))
 
 (defn disp-kan
+  "if a Kan swara is present, display it before the primary swara. Height indicated by
+  `kan-raise` , `reduce-font-size` params"
   [dispinfo inp]
   (let [[oct note] inp
         {:keys [x y font-size spacing text-align kan octave] :as di} dispinfo
@@ -40,6 +43,7 @@
     dip))
 
 (defn disp-sam-khaali
+  "add a sam, khaali or taali for the indicated taal, below the main swara "
   [dispinfo inp]
   (let [{:keys [x y sam-khaali font-size]} dispinfo
         {:keys [beat]} inp]
@@ -50,6 +54,7 @@
     dispinfo))
 
 (defn disp-bhaag
+  "display a bhaag, indicated by a vertical bar"
   [dispinfo inp]
   (let [{:keys [x y x-start x-end sam-khaali font-size spacing y-inc]} dispinfo
         {:keys [bhaag beat]} inp ]
@@ -64,6 +69,7 @@
       dispinfo)))
 
 (defn disp-meend
+  "if a `meend` annotation exists, display a upper curly bracket."
   [dispinfo ]
   (let [over-text "︵"
         {:keys [x y over]} dispinfo]
@@ -72,6 +78,7 @@
     dispinfo))
 
 (defn disp-swara
+  "display a single swara, which may include kan swaras, meendss."
   [dispinfo inp]
   (let [{:keys [:note :kan :khatka :meend-start :meend-end bhaag]} inp
         swaramap (:swaramap dispinfo)
@@ -108,7 +115,8 @@
 
 (defn disp-underbrace
   "draws the underbrace under swaras where cnt > 1.
-  The third argument is the width of the characters under which to draw the underbrace"
+  The third argument is the width of the characters under which to draw the underbrace.
+  If the number of swaras is 2, it shows an curly bracket, else it draws an arc"
   [dispinfo inp char-width]
   (let [under-m "︶"
         {:keys [x y under]} dispinfo
@@ -124,7 +132,7 @@
 
 
 (defn disp-s-note
-  "show an s-note"
+  "Display an s-note, which is the set of notes in a single beat of the taal."
   [dispinfo inp]
   (if (= 1 (count inp))
     (disp-note dispinfo (first inp))
@@ -151,11 +159,14 @@
                          :y y :ith [(inc (first ith))]}))))
 
 (defn disp-m-note
+  "display the sequence of all notes"
   [dispinfo inp]
   (->> (reduce disp-s-note dispinfo inp)
        #_add-cursor-at-end))
 
 (defn disp-part-label
+  "if the part has a label, and `write-part-label` is true, display the name or label
+  associated with the part"
   [dispinfo inp]
   (let [{:keys [part-header-font-size x y header-y-spacing write-part-label]} dispinfo]
     (if write-part-label 
@@ -166,6 +177,8 @@
       dispinfo)))
 
 (defn split-into-bhaags
+  "given a sequence of notes and bhaag information from the taal, interleave the bhaag
+  indicated by `|` with the notes"
   [inp bhaags]
   (let [redfn (fn[{:keys [pre post] :as m} i]
                 (let [[f1 f2] (split-at i post)]
@@ -186,6 +199,7 @@
                      (reduce into)))))
 
 (defn add-sam-khali
+  "Given taal information, add sam, taali and khaali to the note seq"
   [{:keys [:m-noteseq :taal :part-label] :as m}]
   (let [sam-khaali (taal :sam-khaali)
         nb (taal :num-beats)]
@@ -197,6 +211,7 @@
                  (iterate #(if (> nb %) (inc %) 1) 1)))))
 
 (defn line-separator
+  "if `write-line-separator` is true, add a line separator between parts"
   [dispinfo]
   (let [{:keys [x y x-end header-y-spacing write-line-separator]} dispinfo
         x2 (/ x-end 2)
@@ -211,6 +226,7 @@
       (assoc dispinfo :y y1))))
 
 (defn disp-part
+  "display a single part"
   [dispinfo inp]
   (let [{:keys [x y x-start header-y-spacing]} dispinfo
         {:keys [:m-noteseq :taal :part-label]}
@@ -226,6 +242,7 @@
         (update-in [:part-coordinates] (comp vec reverse)))))
 
 (defn disp-comp-label
+  "if `write-comp-label` is true, display the composition label"
   [dispinfo inp]
   (let [{:keys [x y x-end comp-label-font-size header-y-spacing write-comp-label]} dispinfo]
     (if write-comp-label
@@ -237,6 +254,7 @@
       dispinfo)))
 
 (defn disp-comp
+  "display the whole composition"
   [dispinfo inp]
   (let [{:keys [:parts :taal :comp-label :comp-id]} inp
         d1 (-> dispinfo
