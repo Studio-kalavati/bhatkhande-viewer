@@ -1,4 +1,4 @@
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Clojars Project](https://img.shields.io/clojars/v/studiokalavati/bhatkhande-viewer.svg)](https://clojars.org/studiokalavati/bhatkhande-viewer)
 
 # Bhatkhande Notation viewer
 
