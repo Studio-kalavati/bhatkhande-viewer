@@ -39,18 +39,23 @@
                   dinfo
                   p/disp-comp))
   ([size-fn dinfo disp-fn]
+   (viewer-sketch size-fn
+                  dinfo
+                  p/disp-comp
+                  (fn[part dinfo]
+                    (setup false (fn[](let [_ (q/background 255)
+                                                   _ (q/fill 0)]
+                                               (disp-fn dinfo @part)))))))
+  ([size-fn dinfo disp-fn setup-fn]
    (fn [part div-id]
-     (let [idraw (fn[](let [_ (q/background 255)
-                            _ (q/fill 0)]
-                        (disp-fn dinfo @part)))]
-       (q/sketch
-        :setup (setup false idraw)
-        :update identity 
-        :draw (fn [state]
-                state)
-        :host div-id
-        :middleware [m/fun-mode]
-        :size (size-fn))))))
+     (q/sketch
+      :setup (setup-fn part dinfo)
+      :update identity 
+      :draw (fn [state]
+              state)
+      :host div-id
+      :middleware [m/fun-mode]
+      :size (size-fn)))))
 
 
 (defn disp-swara-canvas

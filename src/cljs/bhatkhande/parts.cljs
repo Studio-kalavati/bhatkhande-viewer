@@ -162,7 +162,8 @@
   "display the sequence of all notes"
   [dispinfo inp]
   (->> (reduce disp-s-note dispinfo inp)
-       #_add-cursor-at-end))
+       add-cursor-at-end))
+
 
 (defn disp-part-label
   "if the part has a label, and `write-part-label` is true, display the name or label
