@@ -100,7 +100,12 @@
                #(viewer-sketch (constantly @(subscribe [::subs/div-dim :editor]))
                                (assoc @(subscribe [::subs/dispinfo]) :y 30))]
 
-              [disp-swara-canvas (subscribe [::subs/saved-part]) div-id
-               #(viewer-sketch (constantly @(subscribe [::subs/div-dim :editor]))
-                               (assoc @(subscribe [::subs/dispinfo]) :y 30)
-                               p/disp-part)])]]]]))))
+              (let [[_ y1] (p/compute-part-dim @(subscribe [::subs/dispinfo])
+                                               @(subscribe [::subs/saved-part]))
+                    {:keys [header-y-spacing]} @(subscribe [::subs/dispinfo])
+                    [xmax _] @(subscribe [::subs/div-dim :editor])
+                    idim [xmax (+ y1 (* 2 header-y-spacing))]]
+                  [disp-swara-canvas (subscribe [::subs/saved-part]) div-id
+                   #(viewer-sketch (constantly idim)
+                                   (assoc @(subscribe [::subs/dispinfo]) :y 30)
+                                   p/disp-part)]))]]]]))))

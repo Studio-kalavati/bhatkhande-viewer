@@ -10,8 +10,7 @@
 
 (defn dev-setup []
   (when config/debug?
-    (enable-console-print!)
-    (println "dev mode")))
+    (enable-console-print!)))
 
 (defn mount-root []
   (re-frame/clear-subscription-cache!)

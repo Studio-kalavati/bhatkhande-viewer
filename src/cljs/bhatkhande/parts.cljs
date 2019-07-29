@@ -53,19 +53,34 @@
         (q/text beat x (+ y sam-khaali))))
     dispinfo))
 
+(defn bhaag-dispinfo
+  [dispinfo inp]
+  (let [{:keys [x y x-start x-end  y-inc]} dispinfo]
+    (if (>= x (* 0.9 x-end)) [x-start (+ y y-inc)]
+        [x y])))
+
 (defn disp-bhaag
   "display a bhaag, indicated by a vertical bar"
   [dispinfo inp]
   (let [{:keys [x y x-start x-end sam-khaali font-size spacing y-inc]} dispinfo
         {:keys [bhaag beat]} inp ]
     (if bhaag
-      (let [ix x 
-            [ix y1] (if (>= ix (* 0.9 x-end)) [x-start (+ y y-inc)]
-                        [ix y])]
+      (let [[ix y1] (bhaag-dispinfo dispinfo inp)]
         (do
           (q/stroke-weight 1)
           (q/line [ix (- y1 sam-khaali)] [ix (+ y1 sam-khaali)])
           (assoc dispinfo :x (+ ix spacing (q/text-width bhaag)) :y y1)))
+      dispinfo)))
+
+(defn comp-bhaag
+  "comp dim for a bhaag, indicated by a vertical bar"
+  [dispinfo inp]
+  (let [{:keys [x y x-start x-end sam-khaali font-size spacing y-inc]} dispinfo
+        {:keys [bhaag beat]} inp ]
+    (if bhaag
+      (let [[ix y1] (bhaag-dispinfo dispinfo inp)]
+        ;;bhaag width is usually 0.25 of font size 
+        (assoc dispinfo :x (+ ix spacing (* 0.25 font-size)) :y y1))
       dispinfo)))
 
 (defn disp-meend
@@ -77,8 +92,8 @@
       (q/text over-text x (- y over)))
     dispinfo))
 
-(defn disp-swara
-  "display a single swara, which may include kan swaras, meendss."
+(defn swara-dispinfo
+  "utility fn for swara dispinfo."
   [dispinfo inp]
   (let [{:keys [:note :kan :khatka :meend-start :meend-end bhaag]} inp
         swaramap (:swaramap dispinfo)
@@ -87,7 +102,16 @@
                      (update-in [:part-coordinates] #(conj % {:x (:x dispinfo)
                                                               :y (:y dispinfo)
                                                               :text disptext
-                                                              :ith (:ith dispinfo)})))
+                                                              :ith (:ith dispinfo)})))]
+    dispinfo))
+
+(defn disp-swara
+  "display a single swara, which may include kan swaras, meendss."
+  [dispinfo inp]
+  (let [{:keys [:note :kan :khatka :meend-start :meend-end bhaag]} inp
+        swaramap (:swaramap dispinfo)
+        disptext (swaramap (note 1))
+        dispinfo (swara-dispinfo dispinfo inp) 
         dispinfo (if kan (disp-kan dispinfo kan) dispinfo)
         _ (if meend-start (disp-meend dispinfo))
         ;;save the starting x y to save the part-coordinates
@@ -104,6 +128,17 @@
       (println " disp-swara text " disptext " x " x " y " y
                " spacing "spacing " width " (q/text-width disptext)))
     (q/text disptext x y)
+    dip))
+
+(defn comp-swara
+  "display a single swara, which may include kan swaras, meendss."
+  [dispinfo inp]
+  (let [dispinfo (swara-dispinfo dispinfo inp) 
+        {:keys [x y font-size spacing ith] :as di} dispinfo
+        ;;the average of the width of a swara is empirically about 0.65 times the font-size
+        dip (-> dispinfo
+                (update-in [:x] (fn[i] (+ i spacing (* 0.65 font-size) )))
+                (update-in [:ith] incr-ith))]
     dip))
 
 (defn disp-note
@@ -130,6 +165,18 @@
         (q/fill cur-fill))
       (q/text under-m x (+ y under)))))
 
+(defn s-note-dispinfo
+  [dispinfo ]
+  (let [ispa (:spacing dispinfo)]
+    (-> dispinfo
+        (assoc :spacing ispa :x (+ ispa (:x dispinfo)))
+        (update-in [:ith] (comp incr-ith pop)))))
+
+(defn note-dispinfo
+  [dispinfo]
+  (-> dispinfo
+      (assoc :spacing 1)
+      (update-in [:ith] #(conj % 0))))
 
 (defn disp-s-note
   "Display an s-note, which is the set of notes in a single beat of the taal."
@@ -138,16 +185,30 @@
     (disp-note dispinfo (first inp))
     (let [ispa (:spacing dispinfo)
           {:keys [x y ]} dispinfo
-          res (reduce disp-note (-> dispinfo
-                                    (assoc :spacing 1)
-                                    (update-in [:ith] #(conj % 0))) inp)
+          res (reduce disp-note (note-dispinfo dispinfo) inp)
           ;;display underbrace after drawing swaras, so that the underbrace knows the swara width
           _ (disp-underbrace dispinfo inp (- (:x res) x))
           ]
       ;;remove spacing so that the swaras as close together
-      (-> res
-          (assoc :spacing ispa :x (+ ispa (:x res)))
-          (update-in [:ith] (comp incr-ith pop))))))
+      (s-note-dispinfo (assoc res :spacing ispa)))))
+
+(defn comp-note
+  [dispinfo inp]
+  (let [{:keys [bhaag]} inp]
+    (if bhaag
+      (comp-bhaag dispinfo inp)
+      (comp-swara dispinfo inp))))
+
+(defn comp-s-note
+  "computes dim an s-note, which is the set of notes in a single beat of the taal."
+  [dispinfo inp]
+  (if (= 1 (count inp))
+    (comp-note dispinfo (first inp))
+    (let [ispa (:spacing dispinfo)
+          {:keys [x y ]} dispinfo
+          res (reduce comp-note (note-dispinfo dispinfo) inp)]
+      ;;remove spacing so that the swaras as close together
+      (s-note-dispinfo (assoc res :spacing ispa)))))
 
 (defn add-cursor-at-end
   [{:keys [part-coordinates spacing] :as dispinfo}]
@@ -179,7 +240,9 @@
 
 (defn split-into-bhaags
   "given a sequence of notes and bhaag information from the taal, interleave the bhaag
-  indicated by `|` with the notes"
+  indicated by `|` with the notes
+  TODO: doesn't show bhaag for middle of teentaal
+  "
   [inp bhaags]
   (let [redfn (fn[{:keys [pre post] :as m} i]
                 (let [[f1 f2] (split-at i post)]
@@ -187,7 +250,7 @@
         res (reduce redfn {:pre [] :post inp}
                     bhaags)
         intr (repeat (count bhaags) [[{:bhaag "|"}]])]
-    (reduce into (->> (->> (:pre res) (remove empty?) vec) 
+    (reduce into (->> (:pre res) (remove empty?) vec 
                       (interleave intr)))))
 
 (defn append-bhaags
@@ -226,21 +289,45 @@
         (assoc dispinfo :y (+ y1 header-y-spacing)))
       (assoc dispinfo :y y1))))
 
+(defn max-xy
+  [pc]
+  (let [e (map #(mapv % [:x :y]) pc)
+        x (mapv first e)
+        y (mapv second e)]
+    [(apply max x) (apply max y)]))
+
 (defn disp-part
   "display a single part"
   [dispinfo inp]
   (let [{:keys [x y x-start header-y-spacing]} dispinfo
-        {:keys [:m-noteseq :taal :part-label]}
+        {:keys [:m-noteseq :taal :part-label] :as m1}
         (-> inp add-sam-khali append-bhaags)
         d1 
         (-> dispinfo
             (assoc :ith [0])
             (disp-part-label part-label)
-            (disp-m-note m-noteseq))]
-    (-> d1
-        line-separator
-        (assoc :x x-start)
-        (update-in [:part-coordinates] (comp vec reverse)))))
+            (disp-m-note m-noteseq))
+        res 
+        (-> d1
+            line-separator
+            (assoc :x x-start)
+            (update-in [:part-coordinates] (comp vec reverse)))]
+    res))
+
+
+(defn compute-part-dim
+  "compute dimensions of a part"
+  [dispinfo inp]
+  (let [{:keys [x y x-start header-y-spacing]} dispinfo
+        {:keys [:m-noteseq :taal :part-label] :as m1}
+        (-> inp add-sam-khali append-bhaags)
+        d1 (reduce comp-s-note (assoc dispinfo :ith [0]) m-noteseq)
+        res 
+        (-> d1
+            (assoc :x x-start)
+            (update-in [:part-coordinates] (comp vec reverse)))
+        mxy (max-xy (:part-coordinates res))]
+    mxy))
 
 (defn disp-comp-label
   "if `write-comp-label` is true, display the composition label"

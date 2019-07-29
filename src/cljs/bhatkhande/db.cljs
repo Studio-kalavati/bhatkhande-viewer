@@ -1,7 +1,9 @@
 (ns bhatkhande.db
   (:require
    [bhatkhande.hindi :as hindi]
-   [sargam.spec :as us]))
+   [sargam.spec :as us]
+   [sargam.talas :as t]
+   ))
 
 (defn percentage-95
   [i]
@@ -34,7 +36,6 @@
    :sam-khaali 35
    :debug {:disp-swara false}
    :font-size 20
-   ;:font-size 25
    :spacing 10 :text-align :left})
 
 (def iseq1 [[{:note [:madhyam :s]}]
@@ -110,19 +111,13 @@
 
 (def test1
   {:m-noteseq iseq1
-   :taal {:num-beats 10 :taal-name :jhaptaal
-          :taal-label "झपताल"
-          :sam-khaali {1 "x" 3 "2" 8 "4" 6 "o"}
-          :bhaags [2 3 2 3]}
+   :taal t/teentaal 
    :part-label "partname"})
 
 (def comp1 {:parts [{:m-noteseq iseq1
                      :part-label "स्थाइ"}
                     {:m-noteseq antara1 :part-label "अन्तरा"}]
-            :taal {:num-beats 10 :taal-name :jhaptaal
-                   :taal-label "झपताल"
-                   :sam-khaali {1 "x" 3 "2" 8 "4" 6 "o"}
-                   :bhaags [2 3 2 3]}
+            :taal t/teentaal 
             :comp-id "fadaccaa"
             :comp-label "नीर भरन कैसे जाउ"})
 
