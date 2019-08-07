@@ -1,7 +1,9 @@
 (ns bhatkhande.parts
   (:require [quil.core :as q :include-macros true]
             [quil.middleware :as m]
-            [quil.core :as q]))
+            [re-frame.core :as re-frame :refer [subscribe]]
+            [quil.core :as q]
+            [bhatkhande.subs :as subs]))
 
 (defn- incr-ith
   [k]
@@ -35,7 +37,7 @@
         _ (q/text-size (- font-size reduce-font-size))
         _ (q/text-align text-align)
         _ (disp-octave (assoc dispinfo :y y1 :octave (- octave reduce-octave-size)) oct)
-        swaramap (:swaramap dispinfo)
+        swaramap @(subscribe [::subs/swaramap])
         disptext (swaramap note)
         dip (update-in dispinfo [:x] (fn[i] (+ i (/ spacing reduce-spacing) (q/text-width disptext))))
         ]
@@ -96,7 +98,7 @@
   "utility fn for swara dispinfo."
   [dispinfo inp]
   (let [{:keys [:note :kan :khatka :meend-start :meend-end bhaag]} inp
-        swaramap (:swaramap dispinfo)
+        swaramap @(subscribe [::subs/swaramap])
         disptext (swaramap (note 1))
         dispinfo (-> dispinfo
                      (update-in [:part-coordinates] #(conj % {:x (:x dispinfo)
@@ -109,7 +111,7 @@
   "display a single swara, which may include kan swaras, meendss."
   [dispinfo inp]
   (let [{:keys [:note :kan :khatka :meend-start :meend-end bhaag]} inp
-        swaramap (:swaramap dispinfo)
+        swaramap @(subscribe [::subs/swaramap])
         disptext (swaramap (note 1))
         dispinfo (swara-dispinfo dispinfo inp) 
         dispinfo (if kan (disp-kan dispinfo kan) dispinfo)

@@ -21,8 +21,7 @@
    :write-part-label true
    :write-comp-label true
    :write-line-separator true
-   :language :hindi
-   :swaramap #'bhatkhande.hindi/swaramap
+   ;:swaramap #'bhatkhande.hindi/swaramap
 
    :kan {:kan-raise 10
          :reduce-font-size 5
@@ -124,6 +123,7 @@
 (def default-db
   {:init-state {:cursor-color 1}
    :dim (mapv dispinfo [:x-end :y-end])
+   :language :english
    :saved-comp comp1
    :saved-part test1
    :dispinfo dispinfo})

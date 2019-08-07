@@ -9,4 +9,4 @@
                          ["Bhoop" "Hansadhwani" "Bilaval" "Todi" "Tilak Kamod"]))
 
 (def swaramap (zipmap us/i-note-seq
-                      ["s" "̱r" "r" "̱g" "g" "m" "̍m" "p" "̱d" "d" "̱n" "n" "-" "ऽ"]))
+                      ["S"  "r" "R"  "g" "G" "M" "m" "P" "d" "D" "n" "N" "-" "ऽ"]))

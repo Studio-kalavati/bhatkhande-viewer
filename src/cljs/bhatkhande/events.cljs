@@ -8,3 +8,8 @@
  ::initialize-db
  (fn [_ _]
    db/default-db))
+
+(reg-event-db
+ ::set-language
+ (fn [db [_ lang]]
+   (assoc db :language lang)))
