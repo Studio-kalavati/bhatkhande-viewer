@@ -1,7 +1,7 @@
 (ns bhatkhande.subs
   (:require
    [re-frame.core :as re-frame :refer [reg-sub]]
-   [bhatkhande.languages :refer [lang-labels]]))
+   [sargam.languages :refer [lang-labels]]))
 
 (reg-sub
  ::saved-part

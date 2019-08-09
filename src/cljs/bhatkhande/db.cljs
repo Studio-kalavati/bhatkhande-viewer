@@ -1,16 +1,15 @@
 (ns bhatkhande.db
   (:require
-   [bhatkhande.hindi :as hindi]
    [sargam.spec :as us]
    [sargam.talas :as t]
    ))
+
 
 (defn percentage-95
   [i]
   (let [ iw (js/parseInt i)]
     (- iw (* 0.05 iw))))
 
-                                        ;(def selected-language #'bhatkhande.hindi)
 (def dispinfo
   {:x 20 :y 30 :under 30
    :x-start 20
@@ -21,7 +20,6 @@
    :write-part-label true
    :write-comp-label true
    :write-line-separator true
-   ;:swaramap #'bhatkhande.hindi/swaramap
 
    :kan {:kan-raise 10
          :reduce-font-size 5

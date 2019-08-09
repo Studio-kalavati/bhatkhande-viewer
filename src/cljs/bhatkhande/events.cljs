@@ -13,3 +13,10 @@
  ::set-language
  (fn [db [_ lang]]
    (assoc db :language lang)))
+
+(reg-event-db
+ ::swap-language
+ (fn [db _]
+   (let [cur-lang (:language db)
+         n-lang (if (= cur-lang :english) :hindi :english)]
+     (assoc db :language n-lang))))

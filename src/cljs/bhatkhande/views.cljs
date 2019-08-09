@@ -85,12 +85,16 @@
          [[re-com/title
            :label "Example showing a composition annotated with Bhatkhande notation"
            :level :level2]
-          [re-com/h-box :children [(doall (for [c ["comp" "part"]]
-                                            ^{:key c}
-                                            [re-com/radio-button
-                                             :label c :value c
-                                             :model view-comp
-                                             :on-change #(reset! view-comp %)]))]]
+          [re-com/h-box
+           :gap "20px"
+           :children [[re-com/h-box :children [(doall (for [c ["comp" "part"]]
+                                                        ^{:key c}
+                                                        [re-com/radio-button
+                                                         :label c :value c
+                                                         :model view-comp
+                                                         :on-change #(reset! view-comp %)]))]]
+                      [re-com/button :label "Switch language"
+                       :on-click #(dispatch [::ev/swap-language])]]]
           [:div {:style {:position :relative
                          :width "500px"
                          :height "250px"}}
@@ -105,7 +109,7 @@
                     {:keys [header-y-spacing]} @(subscribe [::subs/dispinfo])
                     [xmax _] @(subscribe [::subs/div-dim :editor])
                     idim [xmax (+ y1 (* 2 header-y-spacing))]]
-                  [disp-swara-canvas (subscribe [::subs/saved-part]) div-id
-                   #(viewer-sketch (constantly idim)
-                                   (assoc @(subscribe [::subs/dispinfo]) :y 30)
-                                   p/disp-part)]))]]]]))))
+                [disp-swara-canvas (subscribe [::subs/saved-part]) div-id
+                 #(viewer-sketch (constantly idim)
+                                 (assoc @(subscribe [::subs/dispinfo]) :y 30)
+                                 p/disp-part)]))]]]]))))
