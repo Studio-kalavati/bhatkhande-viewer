@@ -13,6 +13,8 @@
       [i1]
       (conj i i1))) )
 
+(def avg-swara-width 0.65)
+
 (defn disp-octave
   "add a dot above or below a swara"
   [dispinfo inp]
@@ -57,9 +59,26 @@
 
 (defn bhaag-dispinfo
   [dispinfo inp]
-  (let [{:keys [x y x-start x-end  y-inc]} dispinfo]
-    (if (>= x (* 0.9 x-end)) [x-start (+ y y-inc)]
-        [x y])))
+  (let [{:keys [x y x-start x-end y-inc
+                sam-khaali]} dispinfo]
+    (if (>= x (* 0.9 x-end))
+      (let [
+            iseq (->> (get-in dispinfo [:part-coordinates])
+                      reverse)
+            ;;split it into 2 cos we need to join it back
+            ;;the first one that has bhaag should split it
+            [i1 i2] (split-with #(nil? (:bhaag %)) iseq)
+            i3 (reverse i1)
+            start-from (-> i3 first :x)
+            k (mapv #(- (:x %) start-from) i3)
+            ;;add the x-offsets and increment y to next line
+            i4 (mapv #(assoc %1 :x (+ x-start %2) :y (+ y y-inc))
+                     i3 k)
+            i5 (into (vec (reverse i2)) i4)
+            dinfo (assoc-in dispinfo [:part-coordinates] i5)
+            ]
+        {:dispinfo dinfo :coords [x-start (+ y y-inc)]})
+      {:dispinfo dispinfo :coords [x y]})))
 
 (defn disp-bhaag
   "display a bhaag, indicated by a vertical bar"
@@ -67,11 +86,16 @@
   (let [{:keys [x y x-start x-end sam-khaali font-size spacing y-inc]} dispinfo
         {:keys [bhaag beat]} inp ]
     (if bhaag
-      (let [[ix y1] (bhaag-dispinfo dispinfo inp)]
+      (let [{:keys [coords] :as d2} (bhaag-dispinfo dispinfo inp)
+            [ix y1] coords]
         (do
           (q/stroke-weight 1)
           (q/line [ix (- y1 sam-khaali)] [ix (+ y1 sam-khaali)])
-          (assoc dispinfo :x (+ ix spacing (q/text-width bhaag)) :y y1)))
+          (-> (:dispinfo d2)
+              (assoc :x (+ ix spacing (q/text-width bhaag)) :y y1)
+              (update-in [:part-coordinates]
+                         #(conj % {:bhaag :bhaag})
+                         ))))
       dispinfo)))
 
 (defn comp-bhaag
@@ -80,18 +104,41 @@
   (let [{:keys [x y x-start x-end sam-khaali font-size spacing y-inc]} dispinfo
         {:keys [bhaag beat]} inp ]
     (if bhaag
-      (let [[ix y1] (bhaag-dispinfo dispinfo inp)]
+      (let [{:keys [coords] :as d2} (bhaag-dispinfo dispinfo inp)
+            [ix y1] coords]
         ;;bhaag width is usually 0.25 of font size 
-        (assoc dispinfo :x (+ ix spacing (* 0.25 font-size)) :y y1))
+        (assoc (:dispinfo d2) :x (+ ix spacing (* 0.25 font-size)) :y y1))
       dispinfo)))
 
 (defn disp-meend
   "if a `meend` annotation exists, display a upper curly bracket."
-  [dispinfo ]
+  [dispinfo swaratext]
   (let [over-text "︵"
-        {:keys [x y over]} dispinfo]
+        {:keys [x y over font-size spacing]} dispinfo
+        sw (* avg-swara-width font-size)
+        ;;the approximate width is the sum of current note, spacing
+        ;;the average width of a note
+        approx-width ( + (q/text-width swaratext) sw spacing)
+        #_(println " disp-meend " x "  2 swara width " approx-width
+                 " swarawidth "
+                 (q/text-width swaratext)
+                                        ;" text width "
+                                        ;(q/text-width over-text)
+                ; " start at " k1 " - " (+ x k1)
+                 )
+        ;;increase the font size by a bit to make the meend wider
+        _ (q/text-size (* 1.5 font-size))
+        ;;push the x start by half of the difference between the swara and the meend over text
+        k1 (/ (-  approx-width (q/text-width over-text)) 2)
+        ]
+    
     (do
-      (q/text over-text x (- y over)))
+      ;(println " over-width "(q/text-width over-text) " k1 " k1)
+      (q/text over-text (+ x k1) (- y over))
+      )
+
+    ;;reset the font size back
+    (q/text-size font-size)
     dispinfo))
 
 (defn swara-dispinfo
@@ -115,9 +162,9 @@
         disptext (swaramap (note 1))
         dispinfo (swara-dispinfo dispinfo inp) 
         dispinfo (if kan (disp-kan dispinfo kan) dispinfo)
-        _ (if meend-start (disp-meend dispinfo))
+        _ (if meend-start (disp-meend dispinfo disptext))
         ;;save the starting x y to save the part-coordinates
-        
+
         {:keys [x y font-size spacing text-align ith] :as di} dispinfo
         _ (disp-sam-khaali dispinfo inp)
         _ (q/text-size font-size)
@@ -136,11 +183,17 @@
   "display a single swara, which may include kan swaras, meendss."
   [dispinfo inp]
   (let [dispinfo (swara-dispinfo dispinfo inp) 
-        {:keys [x y font-size spacing ith] :as di} dispinfo
+        {:keys [x x-end y font-size spacing ith] :as di} dispinfo
         ;;the average of the width of a swara is empirically about 0.65 times the font-size
         dip (-> dispinfo
-                (update-in [:x] (fn[i] (+ i spacing (* 0.65 font-size) )))
+                (update-in [:x] (fn[i] (+ i spacing (* avg-swara-width font-size) )))
                 (update-in [:ith] incr-ith))]
+    #_(if (> x x-end)
+      (println " greater than end " [x x-end ith] " - "(-> (get-in dispinfo [:part-coordinates]) last :text)
+               (drop 8(get-in dispinfo [:part-coordinates]))
+               )
+      (println " all good for " [x x-end ith] " - " (-> (get-in dispinfo [:part-coordinates]) last :text))
+      )
     dip))
 
 (defn disp-note

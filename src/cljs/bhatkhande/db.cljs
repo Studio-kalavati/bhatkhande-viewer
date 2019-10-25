@@ -14,7 +14,8 @@
   {:x 20 :y 30 :under 30
    :x-start 20
    :y-inc 80
-   :x-end (int (percentage-95 (.-innerWidth js/window)))
+   ;:x-end (int (percentage-95 (.-innerWidth js/window)))
+   :x-end (.-innerWidth js/window);(int (percentage-95 (.-innerWidth js/window)))
    :y-end (int (percentage-95 (.-innerHeight js/window)))
    :over 30
    :write-part-label true
@@ -35,13 +36,34 @@
    :font-size 20
    :spacing 10 :text-align :left})
 
-(def iseq1 [[{:note [:madhyam :s]}]
-            [{:note [:taar :r]}]
-            [{:note [:mandra :-n]}]
+(def iseq1 [[{:note [:taar :s]
+              :meend-start true}]
+            [{:note [:taar :s]
+              :meend-end true}]
+            [{:note [:taar :r]
+              :meend-start true}]
+            [{:note [:taar :s]
+              :meend-end true}]
+            [{:note [:madhyam :-g]
+              :meend-start true}]
+            [{:note [:madhyam :r]
+              :meend-end true}]
+            [{:note [:taar :p]
+              :meend-start true}]
+            [{:note [:taar :-n]
+              :meend-end true}]
+            [{:note [:madhyam :d]
+              :meend-start true}]
+            [{:note [:madhyam :s]
+              :meend-end true}]
+            [{:note [:taar :n]
+              :meend-start true}]
+            [{:note [:taar :g]
+              :meend-end true}]
+
             [{:note [:madhyam :r]
               :kan [:madhyam :-g]}]
-            [
-             {:note [:taar :g]}
+            [{:note [:taar :g]}
              {:note [:taar :r]}
              {:note [:mandra :n]}
              {:note [:madhyam :s]}
