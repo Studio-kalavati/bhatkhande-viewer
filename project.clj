@@ -25,6 +25,8 @@
                                     "test/js"]
   :figwheel {:css-dirs ["resources/public/css"]}
 
+  :repositories [["snapshots" "https://maven.pkg.github.com/Studio-kalavati/bhatkhande-notation"]
+               ["releases" "https://maven.pkg.github.com/Studio-kalavati/bhatkhande-notation"]]
   :doo {:build "test"}
   :profiles
   {:dev
