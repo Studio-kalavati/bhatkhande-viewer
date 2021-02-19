@@ -2,7 +2,7 @@
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/clojurescript "1.10.516"]
                  [reagent "0.8.1"]
-                 [studiokalavati/sargam-spec "0.1.4"]
+                 [studiokalavati/sargam-spec "0.1.7"]
                  [reagent-utils "0.3.1"]
                  [re-frame "0.10.6"]
                  [quil "2.8.0"]
